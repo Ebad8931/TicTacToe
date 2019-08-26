@@ -64,14 +64,19 @@ def check_winner():
     GameEnded = True
 
 
-print_board()
-player = 'X'
-while not GameEnded:
-    player_turn(player)
-    check_winner()
+def main():
     print_board()
-    player = switch_player(player)
-if Winner == '-':
-    print("Game is a Tie!")
-else:
-    print('\n' + Winner + ' WON!')
+    player = 'X'
+    while not GameEnded:
+        player_turn(player)
+        check_winner()
+        is_draw()
+        print_board()
+        player = switch_player(player)
+    if Winner == '-':
+        print("\nGame is a Tie!")
+    else:
+        print('\n' + Winner + ' WON!')
+
+
+main()
