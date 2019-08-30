@@ -1,6 +1,32 @@
+from enum import Enum
+
 board = ['-', '-', '-',
          '-', '-', '-',
          '-', '-', '-']
+
+
+class PlayerType(Enum):
+    user = 1
+    easyAI = 2
+    mediumAI = 3
+    hardAI = 4
+
+
+playerX = PlayerType.user.value     # PlayerX will always be user
+playerO = 0                         # Will be assigned after selection of Mode
+playerX_name = 'Not Assigned'
+playerO_name = 'Not Assigned'
+
+
+class Mode(Enum):
+    singlePlayer = 1
+    twoPlayer = 2
+
+
+playing_mode = 0
+
+current_player = playerX            # default starting player
+
 GameEnded = False
 Winner = '-'
 
@@ -11,13 +37,53 @@ def print_board():
     print(board[6], board[7], board[8])
 
 
+def set_playing_mode():
+    for x in Mode:
+        print('Select ' + str(x.value) + ' for ' + x.name)
+    mode = int(input())
+    while mode <= 0 or mode > 2:
+        print('Invalid choice. Select Again')
+        mode = int(input())
+    global playing_mode
+    playing_mode = mode
+    set_2nd_player()
+    set_players_name()
+
+
+def set_2nd_player():
+    global playerO
+    if playing_mode == Mode.singlePlayer.value:
+        print('\nSelect 1 for Easy:')
+        print('Select 2 for Medium:')
+        print('Select 3 for Hard:')
+        difficulty = int(input())
+        while difficulty <= 0 or difficulty > 3:
+            print('Invalid choice. Select Again')
+            difficulty = int(input())
+        if difficulty == 1:
+            playerO = PlayerType.easyAI.value
+        if difficulty == 2:
+            playerO = PlayerType.mediumAI.value
+        if difficulty == 3:
+            playerO = PlayerType.hardAI.value
+    if playing_mode == Mode.twoPlayer.value:
+        playerO = PlayerType.user.value
+
+
+def set_players_name():
+    global playerX_name, playerO_name
+    playerX_name = input("Enter Player 1's name: ")
+    if playerO == PlayerType.user.value:
+        playerO_name = input("Enter Player 2's name: ")
+    elif playerO_name == PlayerType.easyAI.value or PlayerType.mediumAI.value or PlayerType.hardAI.value:
+        playerO_name = 'Computer'
+
+
 def switch_player(p):
-    if p == 'X':
-        return 'O'
-    elif p == 'O':
-        return 'X'
-    else:
-        return 'Invalid'
+    if p == playerX:
+        return playerO
+    if p == playerO:
+        return playerX
 
 
 def player_turn(p):
@@ -64,7 +130,7 @@ def check_winner():
     GameEnded = True
 
 
-def main():
+def two_payer_game():
     print_board()
     player = 'X'
     while not GameEnded:
@@ -79,4 +145,10 @@ def main():
         print('\n' + Winner + ' WON!')
 
 
-main()
+print(playing_mode)
+set_playing_mode()
+print(playing_mode)
+print(playerX)
+print(playerX_name)
+print(playerO)
+print(playerO_name)
