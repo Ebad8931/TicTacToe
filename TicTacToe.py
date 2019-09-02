@@ -86,6 +86,22 @@ def switch_player(p):
         return playerX
 
 
+def get_move():
+    if current_player == PlayerType.user.value:
+        return get_user_move()
+    else:
+        return 1
+
+
+def get_user_move():
+    move = int(input('Select Location (0-8) : '))
+    if 0 <= move < 9 and board[move] == "-":
+        return move
+    else:
+        print("Invalid Input!")
+        get_user_move()
+
+
 def player_turn(p):
     x = input("Select Location (0-8) : ")
     x = int(x)
