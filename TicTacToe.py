@@ -7,9 +7,10 @@ board = ['-', '-', '-',
 
 class PlayerType(Enum):
     user = 1
-    easyAI = 2
-    mediumAI = 3
-    hardAI = 4
+    otherUser = 2
+    easyAI = 3
+    mediumAI = 4
+    hardAI = 5
 
 
 playerX = PlayerType.user.value     # PlayerX will always be user
@@ -62,35 +63,42 @@ def set_2nd_player():
             difficulty = int(input())
         if difficulty == 1:
             playerO = PlayerType.easyAI.value
-        if difficulty == 2:
+        elif difficulty == 2:
             playerO = PlayerType.mediumAI.value
-        if difficulty == 3:
+        elif difficulty == 3:
             playerO = PlayerType.hardAI.value
-    if playing_mode == Mode.twoPlayer.value:
-        playerO = PlayerType.user.value
+    elif playing_mode == Mode.twoPlayer.value:
+        playerO = PlayerType.otherUser.value
 
 
 def set_players_name():
     global playerX_name, playerO_name
     playerX_name = input("Enter Player 1's name: ")
-    if playerO == PlayerType.user.value:
+    if playerO == PlayerType.user.value or playerO == PlayerType.otherUser.value:
         playerO_name = input("Enter Player 2's name: ")
-    elif playerO_name == PlayerType.easyAI.value or PlayerType.mediumAI.value or PlayerType.hardAI.value:
+    elif playerO == PlayerType.easyAI.value or playerO == PlayerType.mediumAI.value \
+            or playerO == PlayerType.hardAI.value:
         playerO_name = 'Computer'
 
 
-def switch_player(p):
-    if p == playerX:
-        return playerO
-    if p == playerO:
-        return playerX
+def switch_player():
+    global current_player
+    if current_player == playerX:
+        current_player = playerO
+    elif current_player == playerO:
+        current_player = playerX
 
 
 def get_move():
-    if current_player == PlayerType.user.value:
+    # This function returns any value between 0 and 8
+    if current_player == PlayerType.user.value or current_player == PlayerType.otherUser.value:
         return get_user_move()
-    else:
-        return 1
+    elif current_player == PlayerType.easyAI.value:
+        return get_easy_move()
+    elif current_player == PlayerType.mediumAI.value:
+        return get_medium_move()
+    elif current_player == PlayerType.hardAI.value:
+        return get_hard_move()
 
 
 def get_user_move():
@@ -99,18 +107,38 @@ def get_user_move():
         return move
     else:
         print("Invalid Input!")
-        get_user_move()
+        return get_user_move()
 
 
-def player_turn(p):
-    x = input("Select Location (0-8) : ")
-    x = int(x)
-    if 0 <= x < 9 and board[x] == "-":
-        board[x] = p
-    else:
-        print("Invalid Input!")
-        player_turn(p)
-    return
+def get_easy_move():
+    from random import randint
+    x = 0
+    while board[x] != '-':
+        x = randint(0, 8)
+    return x
+
+
+def get_medium_move():
+    from random import randint
+    x = 0
+    while board[x] != '-':
+        x = randint(0, 8)
+    return x
+
+
+def get_hard_move():
+    from random import randint
+    x = 0
+    while board[x] != '-':
+        x = randint(0, 8)
+    return x
+
+
+def execute_move(move):
+    if current_player == playerX:
+        board[move] = 'X'
+    elif current_player == playerO:
+        board[move] = 'O'
 
 
 def is_draw():
@@ -120,51 +148,37 @@ def is_draw():
 
 
 def check_winner():
-    global Winner
+    global Winner, GameEnded
     # check rows
-    if board[0] == board[1] == board[2] != '-':
-        Winner = board[0]
-    elif board[3] == board[4] == board[5] != '-':
-        Winner = board[3]
-    elif board[6] == board[7] == board[8] != '-':
-        Winner = board[6]
-    # check columns
-    elif board[0] == board[3] == board[6] != '-':
-        Winner = board[0]
-    elif board[1] == board[4] == board[7] != '-':
-        Winner = board[1]
-    elif board[2] == board[5] == board[8] != '-':
-        Winner = board[2]
-    # check diagonals
-    elif board[0] == board[4] == board[8] != '-':
-        Winner = board[0]
-    elif board[2] == board[4] == board[6] != '-':
-        Winner = board[2]
+    if (board[0] == board[1] == board[2] != '-') \
+            or (board[3] == board[4] == board[5] != '-') \
+            or (board[6] == board[7] == board[8] != '-') \
+            or (board[0] == board[3] == board[6] != '-') \
+            or (board[1] == board[4] == board[7] != '-') \
+            or (board[2] == board[5] == board[8] != '-') \
+            or (board[0] == board[4] == board[8] != '-') \
+            or (board[2] == board[4] == board[6] != '-'):
+        Winner = current_player
+        GameEnded = True
     else:
         return
-    global GameEnded
-    GameEnded = True
 
 
-def two_payer_game():
+def play_game():
     print_board()
-    player = 'X'
     while not GameEnded:
-        player_turn(player)
+        execute_move(get_move())
         check_winner()
         is_draw()
         print_board()
-        player = switch_player(player)
+        switch_player()
     if Winner == '-':
         print("\nGame is a Tie!")
-    else:
-        print('\n' + Winner + ' WON!')
+    elif Winner == playerX:
+        print('\n' + playerX_name + ' Wins!')
+    elif Winner == playerO:
+        print('\n' + playerO_name + ' Wins!')
 
 
-print(playing_mode)
 set_playing_mode()
-print(playing_mode)
-print(playerX)
-print(playerX_name)
-print(playerO)
-print(playerO_name)
+play_game()
