@@ -1,8 +1,11 @@
 from enum import Enum
+from random import randint
 
-board = ['-', '-', '-',
-         '-', '-', '-',
-         '-', '-', '-']
+
+class Mode(Enum):
+    singlePlayer = 1
+    twoPlayer = 2
+    EXIT = 3
 
 
 class PlayerType(Enum):
@@ -13,23 +16,35 @@ class PlayerType(Enum):
     hardAI = 5
 
 
+playing_mode = 0
 playerX = PlayerType.user.value     # PlayerX will always be user
 playerO = 0                         # Will be assigned after selection of Mode
 playerX_name = 'Not Assigned'
 playerO_name = 'Not Assigned'
 
-
-class Mode(Enum):
-    singlePlayer = 1
-    twoPlayer = 2
-
-
-playing_mode = 0
-
-current_player = playerX            # default starting player
-
+board = ['-', '-', '-',
+         '-', '-', '-',
+         '-', '-', '-']
+possible_moves = set(range(9))
 GameEnded = False
 Winner = '-'
+current_player = playerX            # default starting player
+
+
+def reinitialize_game():
+    global board, possible_moves, GameEnded, Winner, current_player
+
+    if not GameEnded:
+        print('Invalid request! Cannot reinitialize')
+    if Winner != '-':
+        current_player = Winner
+        Winner = '-'
+
+    board = ['-', '-', '-',
+             '-', '-', '-',
+             '-', '-', '-']
+    possible_moves = set(range(9))
+    GameEnded = False
 
 
 def print_board():
@@ -39,14 +54,15 @@ def print_board():
 
 
 def set_playing_mode():
+    global playing_mode
     for x in Mode:
         print('Select ' + str(x.value) + ' for ' + x.name)
-    mode = int(input())
-    while mode <= 0 or mode > 2:
+    playing_mode = int(input())
+    while playing_mode <= 0 or playing_mode > 3:
         print('Invalid choice. Select Again')
-        mode = int(input())
-    global playing_mode
-    playing_mode = mode
+        playing_mode = int(input())
+    if playing_mode == Mode.EXIT.value:
+        exit()
     set_2nd_player()
     set_players_name()
 
@@ -54,9 +70,9 @@ def set_playing_mode():
 def set_2nd_player():
     global playerO
     if playing_mode == Mode.singlePlayer.value:
-        print('\nSelect 1 for Easy:')
-        print('Select 2 for Medium:')
-        print('Select 3 for Hard:')
+        print('Select 1 for Easy')
+        print('Select 2 for Medium')
+        print('Select 3 for Hard')
         difficulty = int(input())
         while difficulty <= 0 or difficulty > 3:
             print('Invalid choice. Select Again')
@@ -103,7 +119,7 @@ def get_move():
 
 def get_user_move():
     move = int(input('Select Location (0-8) : '))
-    if 0 <= move < 9 and board[move] == "-":
+    if move in possible_moves:
         return move
     else:
         print("Invalid Input!")
@@ -111,7 +127,6 @@ def get_user_move():
 
 
 def get_easy_move():
-    from random import randint
     x = 0
     while board[x] != '-':
         x = randint(0, 8)
@@ -119,7 +134,6 @@ def get_easy_move():
 
 
 def get_medium_move():
-    from random import randint
     x = 0
     while board[x] != '-':
         x = randint(0, 8)
@@ -127,7 +141,6 @@ def get_medium_move():
 
 
 def get_hard_move():
-    from random import randint
     x = 0
     while board[x] != '-':
         x = randint(0, 8)
@@ -139,6 +152,7 @@ def execute_move(move):
         board[move] = 'X'
     elif current_player == playerO:
         board[move] = 'O'
+    possible_moves.remove(move)
 
 
 def is_draw():
@@ -147,9 +161,7 @@ def is_draw():
         GameEnded = True
 
 
-def check_winner():
-    global Winner, GameEnded
-    # check rows
+def winning_condition_met():
     if (board[0] == board[1] == board[2] != '-') \
             or (board[3] == board[4] == board[5] != '-') \
             or (board[6] == board[7] == board[8] != '-') \
@@ -158,6 +170,14 @@ def check_winner():
             or (board[2] == board[5] == board[8] != '-') \
             or (board[0] == board[4] == board[8] != '-') \
             or (board[2] == board[4] == board[6] != '-'):
+        return True
+    else:
+        return False
+
+
+def check_winner():
+    global Winner, GameEnded
+    if winning_condition_met():
         Winner = current_player
         GameEnded = True
     else:
@@ -180,5 +200,23 @@ def play_game():
         print('\n' + playerO_name + ' Wins!')
 
 
+def exit_or_play_again():
+    print('Select 1 to Play Again')
+    print('Select 2 to go back to Main Menu')
+    choice = int(input())
+    while choice <= 0 or choice > 2:
+        print('Invalid choice. Select Again')
+        choice = int(input())
+
+    reinitialize_game()
+    if choice == 2:
+        global current_player
+        current_player = playerX
+        set_playing_mode()
+    play_game()
+    exit_or_play_again()
+
+
 set_playing_mode()
 play_game()
+exit_or_play_again()
