@@ -25,7 +25,7 @@ playerO_name = 'Not Assigned'
 board = ['-', '-', '-',
          '-', '-', '-',
          '-', '-', '-']
-possible_moves = set(range(9))
+possible_moves = list(range(9))
 GameEnded = False
 Winner = '-'
 current_player = playerX            # default starting player
@@ -43,7 +43,7 @@ def reinitialize_game():
     board = ['-', '-', '-',
              '-', '-', '-',
              '-', '-', '-']
-    possible_moves = set(range(9))
+    possible_moves = list(range(9))
     GameEnded = False
 
 
@@ -126,25 +126,55 @@ def get_user_move():
         return get_user_move()
 
 
+# AI functions
+def take_winning_move():
+    move = None
+    for x in possible_moves:
+        if current_player == playerX:
+            board[x] = 'X'
+        elif current_player == playerO:
+            board[x] = 'O'
+        if winning_condition_met():
+            board[x] = '-'
+            move = x
+            break
+        board[x] = '-'
+    return move
+
+
+def block_winning_move():
+    move = None
+    for x in possible_moves:
+        if current_player == playerX:
+            board[x] = 'O'
+        elif current_player == playerO:
+            board[x] = 'X'
+        if winning_condition_met():
+            board[x] = '-'
+            move = x
+            break
+        board[x] = '-'
+    return move
+
+
 def get_easy_move():
-    x = 0
-    while board[x] != '-':
-        x = randint(0, 8)
-    return x
+    if len(possible_moves) <= 5:    # min moves before somebody can win = 4
+        x = take_winning_move()
+        if x is not None:
+            return x
+        x = block_winning_move()
+        if x is not None:
+            return x
+    x = randint(0, len(possible_moves)-1)
+    return possible_moves[x]
 
 
 def get_medium_move():
-    x = 0
-    while board[x] != '-':
-        x = randint(0, 8)
-    return x
+    return get_easy_move()
 
 
 def get_hard_move():
-    x = 0
-    while board[x] != '-':
-        x = randint(0, 8)
-    return x
+    return get_easy_move()
 
 
 def execute_move(move):
