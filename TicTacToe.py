@@ -222,13 +222,14 @@ def play_game():
         check_winner()
         is_draw()
         print_board()
+        print('')
         switch_player()
     if Winner == '-':
-        print("\nGame is a Tie!")
+        print("Game is a Tie!")
     elif Winner == playerX:
-        print('\n' + playerX_name + ' Wins!')
+        print(playerX_name + ' Wins!')
     elif Winner == playerO:
-        print('\n' + playerO_name + ' Wins!')
+        print(playerO_name + ' Wins!')
 
 
 def exit_or_play_again():
