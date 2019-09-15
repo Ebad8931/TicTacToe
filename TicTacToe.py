@@ -162,6 +162,7 @@ def get_easy_move():
         x = take_winning_move()
         if x is not None:
             return x
+    if len(possible_moves) <= 6:  # min moves before opponent can win = 3
         x = block_winning_move()
         if x is not None:
             return x
