@@ -1,4 +1,5 @@
 class Game:
+
     def __init__(self, mode, first_player, second_player, user_name, other_name):
         self.playing_mode = mode
         self.playerX = first_player  # PlayerX will always be user
@@ -6,13 +7,14 @@ class Game:
         self.playerX_name = user_name
         self.playerO_name = other_name
 
+        self.game_ended = False
+        self.winner = '-'
+        self.current_player = self.playerX  # default starting player
+
         self.board = ['-', '-', '-',
                       '-', '-', '-',
                       '-', '-', '-']
         self.possible_moves = list(range(9))
-        self.game_ended = False
-        self.winner = '-'
-        self.current_player = self.playerX  # default starting player
 
     def print_board(self):
         print(self.board[0], self.board[1], self.board[2])
